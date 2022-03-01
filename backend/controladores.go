@@ -17,12 +17,16 @@ var (
 		Mensagem: "Erro ao converte o ID do contexto",
 		Código:   "CONTROLADORES-[2]",
 	}
+	ErroDiaInvalido = &erroPadrão{
+		Mensagem: "Foi passado um dia inválido",
+		Código:   "CONTROLADORES-[3]",
+	}
 )
 
 type mensagemJSON struct {
 	Mensagem  string
 	Erro      []string
-	Atividade *Atividade
+	Atividade []Atividade
 }
 
 type controlador struct {
@@ -37,6 +41,9 @@ func (controlador *controlador) enviarErro(ginC *gin.Context, erro *Erro) {
 
 	switch erro.Código {
 	case ErroAoValidarID.Código:
+		código = http.StatusBadRequest
+		mensagem = erro.Mensagem
+	case ErroDiaInvalido.Código:
 		código = http.StatusBadRequest
 		mensagem = erro.Mensagem
 	default:
@@ -103,12 +110,34 @@ func (controlador *controlador) pegarTarefa(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %s pega com sucesso", _id)
+	mensagem := fmt.Sprintf("Tarefa com ID %s econtrada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{Mensagem: mensagem, Erro: nil, Atividade: nil})
 }
 
+func diaValido(dia string) bool {
+	dias := []string{"domindo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"}
+
+	for _, valido := range dias {
+		if valido == dia {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (controlador *controlador) pegarTarefasPorDia(ginC *gin.Context) {
+	dia := ginC.Params.ByName("dia")
+	if !diaValido(dia) {
+		controlador.enviarErro(ginC, erroNovo(ErroDiaInvalido, nil, nil))
+
+		return
+	}
+
+	mensagem := fmt.Sprintf("Tarefas do dia %s econtradas com sucesso", dia)
+
+	ginC.JSON(http.StatusOK, mensagemJSON{Mensagem: mensagem, Erro: nil, Atividade: nil})
 }
 
 func (controlador *controlador) pegarTarefas(ginC *gin.Context) {
