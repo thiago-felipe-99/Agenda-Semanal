@@ -9,30 +9,28 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var ErroSalvarAtividadeBD = &erroPadrão{
-	Mensagem: "Erro ao salvar atividade no banco de dados",
-	Código:   "DADOS-[1]",
-}
-
-var ErroAtualizarAtividadeBD = &erroPadrão{
-	Mensagem: "Erro ao atualizar atividade no banco de dados",
-	Código:   "DADOS-[2]",
-}
-
-var ErroAtividadeNãoEncontradaBD = &erroPadrão{
-	Mensagem: "Ativiade não encontrada no banco de dados",
-	Código:   "DADOS-[3]",
-}
-
-var ErroPegarAtividadeBD = &erroPadrão{
-	Mensagem: "Erro ao pegar atividade no banco de dados",
-	Código:   "DADOS-[4]",
-}
-
-var ErroDeletarAtividade = &erroPadrão{
-	Mensagem: "Erro ao deletat atividade no banco de dados",
-	Código:   "DADOS-[5]",
-}
+var (
+	ErroSalvarAtividadeBD = &erroPadrão{
+		Mensagem: "Erro ao salvar atividade no banco de dados",
+		Código:   "DADOS-[1]",
+	}
+	ErroAtualizarAtividadeBD = &erroPadrão{
+		Mensagem: "Erro ao atualizar atividade no banco de dados",
+		Código:   "DADOS-[2]",
+	}
+	ErroAtividadeNãoEncontradaBD = &erroPadrão{
+		Mensagem: "Ativiade não encontrada no banco de dados",
+		Código:   "DADOS-[3]",
+	}
+	ErroPegarAtividadeBD = &erroPadrão{
+		Mensagem: "Erro ao pegar atividade no banco de dados",
+		Código:   "DADOS-[4]",
+	}
+	ErroDeletarAtividade = &erroPadrão{
+		Mensagem: "Erro ao deletat atividade no banco de dados",
+		Código:   "DADOS-[5]",
+	}
+)
 
 type Dados struct {
 	Timeout    time.Duration

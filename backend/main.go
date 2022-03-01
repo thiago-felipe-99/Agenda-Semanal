@@ -10,10 +10,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var ErroConfigurarBD = &erroPadrão{
-	Mensagem: "Erro ao configurar o banco de dados",
-	Código:   "MAIN-[1]",
-}
+var (
+	ErroConfigurarBD = &erroPadrão{
+		Mensagem: "Erro ao configurar o banco de dados",
+		Código:   "MAIN-[1]",
+	}
+	ErroAoValidarID = &erroPadrão{
+		Mensagem: "Foi passado um ID inválido",
+		Código:   "MAIN-[2]",
+	}
+)
 
 type id = uuid.UUID
 
@@ -25,8 +31,17 @@ type Atividade struct {
 	Fim    time.Duration `bson:"fim"`
 }
 
+func ParseID(parse string) (id, *Erro) {
+	id, err := uuid.Parse(parse)
+	if err != nil {
+		return id, erroNovo(ErroAoValidarID, nil, err)
+	}
+
+	return id, nil
+}
+
 func main() {
-	uri := ""
+	uri := "mongodb://root:root@localhost:2001"
 	ctx := context.Background()
 	nomeDB := ""
 	collectionNome := ""
@@ -44,5 +59,5 @@ func main() {
 		Collection: mongoBD.Database(nomeDB).Collection(collectionNome),
 	}
 
-	rotas("127.0.0.1:8080", dados)
+	rotas("127.0.0.1:2000", dados)
 }
