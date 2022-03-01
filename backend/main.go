@@ -43,8 +43,8 @@ func ParseID(parse string) (id, *Erro) {
 func main() {
 	uri := "mongodb://root:root@localhost:2001"
 	ctx := context.Background()
-	nomeDB := ""
-	collectionNome := ""
+	nomeDB := "atividades"
+	collectionNome := "atividades"
 
 	mongoBD, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
@@ -59,5 +59,10 @@ func main() {
 		Collection: mongoBD.Database(nomeDB).Collection(collectionNome),
 	}
 
-	rotas("127.0.0.1:2000", dados)
+	err = mongoBD.Ping(context.Background(), nil)
+	if err != nil {
+		panic(err)
+	}
+
+	rotas("localhost:2000", dados)
 }

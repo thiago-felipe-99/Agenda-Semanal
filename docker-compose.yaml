@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  mongoDB:
+    image: mongo:5.0.3
+    container_name: mongoDB-trabalhofinal
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - ./data/mongoDB:/data/db
+    ports:
+      - "2001:27017"
+
