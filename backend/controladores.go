@@ -47,7 +47,7 @@ func rotasTarefas(roteamento *gin.RouterGroup, controlador *controlador) {
 	roteamento.DELETE("/:id", controlador.pegarID, controlador.deletarTarefa)
 }
 
-func rotas(url string) {
+func rotas(url string, dados *Dados) {
 	roteamento := gin.Default()
 
 	rotasTarefas(roteamento.Group("/atividade"), &controlador{})
