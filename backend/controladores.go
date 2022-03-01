@@ -7,35 +7,27 @@ import (
 type controlador struct{}
 
 func (controlador *controlador) pegarID(c *gin.Context) {
-
 }
 
 func (controlador *controlador) pegarBodyTarefa(c *gin.Context) {
-
 }
 
 func (controlador *controlador) adicionarTarefa(c *gin.Context) {
-
 }
 
 func (controlador *controlador) atualizarTarefa(c *gin.Context) {
-
 }
 
 func (controlador *controlador) pegarTarefa(c *gin.Context) {
-
 }
 
 func (controlador *controlador) pegarTarefasPorDia(c *gin.Context) {
-
 }
 
 func (controlador *controlador) pegarTarefas(c *gin.Context) {
-
 }
 
 func (controlador *controlador) deletarTarefa(c *gin.Context) {
-
 }
 
 func rotasTarefas(roteamento *gin.RouterGroup, controlador *controlador) {

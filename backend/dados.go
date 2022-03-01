@@ -35,16 +35,15 @@ var ErroDeletarAtividade = &erroPadrão{
 }
 
 type Dados struct {
-	BD         *mongo.Database
 	Timeout    time.Duration
-	ctx        context.Context
 	Collection *mongo.Collection
 	Log        *Log
 }
 
-func (dados *Dados) SalvarAtividade(atividade *Atividade) *Erro {
-	dados.Log.Aviso("Salvando atividade no banco de dados a atividade com ID:", atividade.ID)
-	ctx, cancel := context.WithTimeout(dados.ctx, dados.Timeout)
+func (dados *Dados) SalvarAtividade(ctx context.Context, atividade *Atividade) *Erro {
+	dados.Log.Informação("Salvando atividade no banco de dados a atividade com ID:", atividade.ID)
+
+	ctx, cancel := context.WithTimeout(ctx, dados.Timeout)
 	defer cancel()
 
 	_, err := dados.Collection.InsertOne(ctx, atividade)
@@ -55,15 +54,15 @@ func (dados *Dados) SalvarAtividade(atividade *Atividade) *Erro {
 	return nil
 }
 
-func (dados *Dados) AtualizarAtividade(id id, atividade *Atividade) *Erro {
-	dados.Log.Aviso("Atualizando atividade no banco de dados a atividade com ID:", atividade.ID)
+func (dados *Dados) AtualizarAtividade(ctx context.Context, _id id, atividade *Atividade) *Erro {
+	dados.Log.Informação("Atualizando atividade no banco de dados a atividade com ID:", atividade.ID)
 
-	ctx, cancel := context.WithTimeout(dados.ctx, dados.Timeout)
+	ctx, cancel := context.WithTimeout(ctx, dados.Timeout)
 	defer cancel()
 
 	query := bson.D{{Key: "$set", Value: atividade}}
 
-	_, err := dados.Collection.UpdateByID(ctx, id, query)
+	_, err := dados.Collection.UpdateByID(ctx, _id, query)
 	if err != nil {
 		return erroNovo(ErroAtualizarAtividadeBD, nil, err)
 	}
@@ -71,15 +70,15 @@ func (dados *Dados) AtualizarAtividade(id id, atividade *Atividade) *Erro {
 	return nil
 }
 
-func (dados *Dados) PegarAtividade(id id) (*Atividade, *Erro) {
-	dados.Log.Informação("Pegando atividade no banco de dados com ID:", id)
+func (dados *Dados) PegarAtividade(ctx context.Context, _id id) (*Atividade, *Erro) {
+	dados.Log.Informação("Pegando atividade no banco de dados com ID:", _id)
 
-	ctx, cancel := context.WithTimeout(dados.ctx, dados.Timeout)
+	ctx, cancel := context.WithTimeout(ctx, dados.Timeout)
 	defer cancel()
 
 	var atividade Atividade
 
-	err := dados.Collection.FindOne(ctx, bson.M{"_id": id}).Decode(&atividade)
+	err := dados.Collection.FindOne(ctx, bson.M{"_id": _id}).Decode(&atividade)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, erroNovo(ErroAtividadeNãoEncontradaBD, nil, err)
@@ -91,13 +90,13 @@ func (dados *Dados) PegarAtividade(id id) (*Atividade, *Erro) {
 	return &atividade, nil
 }
 
-func (dados *Dados) Deletar(id id) *Erro {
-	dados.Log.Informação("Deletando atividade no banco de dados com ID:", id)
+func (dados *Dados) Deletar(ctx context.Context, _id id) *Erro {
+	dados.Log.Informação("Deletando atividade no banco de dados com ID:", _id)
 
-	ctx, cancel := context.WithTimeout(dados.ctx, dados.Timeout)
+	ctx, cancel := context.WithTimeout(ctx, dados.Timeout)
 	defer cancel()
 
-	_, err := dados.Collection.DeleteOne(ctx, bson.M{"_id": id})
+	_, err := dados.Collection.DeleteOne(ctx, bson.M{"_id": _id})
 	if err != nil {
 		return erroNovo(ErroDeletarAtividade, nil, err)
 	}
