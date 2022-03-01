@@ -24,11 +24,11 @@ var (
 type id = uuid.UUID
 
 type Atividade struct {
-	ID     id            `bson:"_id"`
-	Nome   string        `bson:"nome"`
-	Dia    string        `bson:"dia"`
-	Início time.Duration `bson:"início"`
-	Fim    time.Duration `bson:"fim"`
+	ID     id            `bson:"_id" json:"id" validate:"required"`
+	Nome   string        `bson:"nome" json:"nome" validate:"required"`
+	Dia    string        `bson:"dia" json:"dia" validate:"required"`
+	Início time.Duration `bson:"início" json:"início" validate:"required"`
+	Fim    time.Duration `bson:"fim" json:"fim" validate:"required"`
 }
 
 func ParseID(parse string) (id, *Erro) {
