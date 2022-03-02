@@ -126,7 +126,7 @@ func (dados *Dados) PegarAtividades(ctx context.Context) ([]*Atividade, *Erro) {
 	ctx, cancel := context.WithTimeout(ctx, dados.Timeout)
 	defer cancel()
 
-	cursor, err := dados.Collection.Find(ctx, nil)
+	cursor, err := dados.Collection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, erroNovo(ErroPegarAtividadeDiaDB, nil, err)
 	}

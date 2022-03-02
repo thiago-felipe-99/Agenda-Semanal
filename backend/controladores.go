@@ -378,7 +378,7 @@ func (controlador *controlador) pegarTarefa(ginC *gin.Context) {
 }
 
 func diaValido(dia string) bool {
-	dias := []string{"domindo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"}
+	dias := []string{"domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"}
 
 	for _, valido := range dias {
 		if valido == dia {
