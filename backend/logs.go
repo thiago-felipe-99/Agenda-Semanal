@@ -5,11 +5,12 @@ import (
 	"log"
 )
 
-var ErroNívelInválido = &erroPadrão{
+var ErroNívelInválido = &erroPadrão{ // nolint:revive
 	Mensagem: "O nível escolhido é inválido",
 	Código:   "LOGS-[1]",
 }
 
+// Possíveis níveis que o log pod mostrar.
 const (
 	NívelPanic uint = iota
 	NívelErro
@@ -18,6 +19,7 @@ const (
 	NívelDebug
 )
 
+// Log representa um log na aplicação.
 type Log struct {
 	outPanic      *log.Logger
 	outErro       *log.Logger
@@ -27,11 +29,13 @@ type Log struct {
 	Nível         uint
 }
 
+// Panic imprime o nível panic no log.
 func (log *Log) Panic(imprimir ...interface{}) {
 	log.outPanic.Println(imprimir...)
 	panic(imprimir)
 }
 
+// Erro imprime o nível erro no log.
 func (log *Log) Erro(imprimir ...interface{}) {
 	if log.Nível < NívelErro {
 		return
@@ -40,6 +44,7 @@ func (log *Log) Erro(imprimir ...interface{}) {
 	log.outErro.Println(imprimir...)
 }
 
+// Aviso imprime o nível aviso no log.
 func (log *Log) Aviso(imprimir ...interface{}) {
 	if log.Nível < NívelAviso {
 		return
@@ -48,6 +53,7 @@ func (log *Log) Aviso(imprimir ...interface{}) {
 	log.outAviso.Println(imprimir...)
 }
 
+// Informação imprime o nível Informação no log.
 func (log *Log) Informação(imprimir ...interface{}) {
 	if log.Nível < NívelInfo {
 		return
@@ -56,6 +62,7 @@ func (log *Log) Informação(imprimir ...interface{}) {
 	log.outInformação.Println(imprimir...)
 }
 
+// Debug imprime o nível Debug no log.
 func (log *Log) Debug(imprimir ...interface{}) {
 	if log.Nível < NívelDebug {
 		return
@@ -64,6 +71,7 @@ func (log *Log) Debug(imprimir ...interface{}) {
 	log.outDebug.Println(imprimir...)
 }
 
+// NovoLog criar um novo log da aplicação.
 func NovoLog(out io.Writer, nível uint) *Log {
 	if nível < NívelPanic || nível > NívelDebug {
 		panic(erroNovo(ErroNívelInválido, nil, nil))

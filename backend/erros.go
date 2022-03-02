@@ -2,13 +2,15 @@ package main
 
 import "fmt"
 
-type Erro struct {
+// Erro representa um erro na aplicação.
+type Erro struct { //nolint:errname
 	Mensagem    string
 	ErroInicial *Erro
 	ErroExterno error
 	Código      string
 }
 
+// Traçado retorna todos os erros que ocorreram.
 func (erro *Erro) Traçado() string {
 	mensagem := fmt.Sprintf("Erro Da Aplicação[%s]: %s", erro.Código, erro.Mensagem)
 
@@ -27,6 +29,7 @@ func (erro *Erro) Error() string {
 	return erro.Traçado()
 }
 
+// ErroExterno imprime um erro fora da aplicação.
 func ErroExterno(erro error) string {
 	return fmt.Sprintf("Erro Externo: %s", erro.Error())
 }
@@ -36,6 +39,7 @@ type erroPadrão struct {
 	Código   string
 }
 
+// nolint:unparam
 func erroNovo(padrão *erroPadrão, inicial *Erro, externo error) *Erro {
 	return &Erro{
 		Mensagem:    padrão.Mensagem,

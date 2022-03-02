@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ErroConfigurarBD = &erroPadrão{
+	ErroConfigurarBD = &erroPadrão{ // nolint:revive
 		Mensagem: "Erro ao configurar o banco de dados",
 		Código:   "MAIN-[1]",
 	}
@@ -23,6 +23,7 @@ var (
 
 type id = uuid.UUID
 
+// Atividade representa a entidade atividade da aplicação.
 type Atividade struct {
 	ID     id            `bson:"_id" json:"id" validate:"required"`
 	Nome   string        `bson:"nome" json:"nome" validate:"required"`
@@ -31,6 +32,7 @@ type Atividade struct {
 	Fim    time.Duration `bson:"fim" json:"fim" validate:"required"`
 }
 
+// ParseID retorna um ID a partir de uma string válida.
 func ParseID(parse string) (id, *Erro) {
 	id, err := uuid.Parse(parse)
 	if err != nil {

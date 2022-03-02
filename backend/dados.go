@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErroSalvarAtividadeBD = &erroPadrão{
+	ErroSalvarAtividadeBD = &erroPadrão{ // nolint:revive
 		Mensagem: "Erro ao salvar atividade no banco de dados",
 		Código:   "DADOS-[1]",
 	}
@@ -32,12 +32,14 @@ var (
 	}
 )
 
+// Dados representa um banco de dados na aplicação.
 type Dados struct {
 	Timeout    time.Duration
 	Collection *mongo.Collection
 	Log        *Log
 }
 
+// SalvarAtividade escreve uma atividade no banco de dados.
 func (dados *Dados) SalvarAtividade(ctx context.Context, atividade *Atividade) *Erro {
 	dados.Log.Informação("Salvando atividade no banco de dados a atividade com ID:", atividade.ID)
 
@@ -52,6 +54,8 @@ func (dados *Dados) SalvarAtividade(ctx context.Context, atividade *Atividade) *
 	return nil
 }
 
+// AtualizarAtividade é o método que altera uma atividade já existente no banco
+// de dados.
 func (dados *Dados) AtualizarAtividade(ctx context.Context, _id id, atividade *Atividade) *Erro {
 	dados.Log.Informação("Atualizando atividade no banco de dados a atividade com ID:", atividade.ID)
 
@@ -68,6 +72,7 @@ func (dados *Dados) AtualizarAtividade(ctx context.Context, _id id, atividade *A
 	return nil
 }
 
+// PegarAtividade retorna uma atividade salva no banco de dados.
 func (dados *Dados) PegarAtividade(ctx context.Context, _id id) (*Atividade, *Erro) {
 	dados.Log.Informação("Pegando atividade no banco de dados com ID:", _id)
 
@@ -88,6 +93,7 @@ func (dados *Dados) PegarAtividade(ctx context.Context, _id id) (*Atividade, *Er
 	return &atividade, nil
 }
 
+// Deletar remove uma atividade do banco de dados.
 func (dados *Dados) Deletar(ctx context.Context, _id id) *Erro {
 	dados.Log.Informação("Deletando atividade no banco de dados com ID:", _id)
 

@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	ErroIDNãoExisteNoContexto = &erroPadrão{
+	ErroIDNãoExisteNoContexto = &erroPadrão{ //nolint:revive
 		Mensagem: "O ID não existe no contexto",
 		Código:   "CONTROLADORES-[1]",
 	}
