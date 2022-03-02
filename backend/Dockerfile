@@ -15,4 +15,4 @@ WORKDIR /app
 RUN useradd -m heroku
 USER heroku
 
-ENTRYPOINT ["/app/main"]
+ENTRYPOINT ["./main"]
