@@ -26,8 +26,12 @@ var (
 		Mensagem: "Erro ao pegar atividade no banco de dados",
 		Código:   "DADOS-[4]",
 	}
-	ErroDeletarAtividade = &erroPadrão{
-		Mensagem: "Erro ao deletat atividade no banco de dados",
+	ErroDeletarAtividadeBD = &erroPadrão{
+		Mensagem: "Erro ao deletar atividade no banco de dados",
+		Código:   "DADOS-[5]",
+	}
+	ErroPegarAtividadeDiaDB = &erroPadrão{
+		Mensagem: "Erro ao pegar a atividade por dia",
 		Código:   "DADOS-[5]",
 	}
 )
@@ -93,6 +97,50 @@ func (dados *Dados) PegarAtividade(ctx context.Context, _id id) (*Atividade, *Er
 	return &atividade, nil
 }
 
+// PegarAtividadeDia retorna todas as atividades de um dia do banco de dados.
+func (dados *Dados) PegarAtividadeDia(ctx context.Context, dia string) ([]*Atividade, *Erro) {
+	dados.Log.Informação("Pegando atividades no banco de dados do:", dia)
+
+	ctx, cancel := context.WithTimeout(ctx, dados.Timeout)
+	defer cancel()
+
+	cursor, err := dados.Collection.Find(ctx, bson.M{"dia": dia})
+	if err != nil {
+		return nil, erroNovo(ErroPegarAtividadeDiaDB, nil, err)
+	}
+
+	atividades := []*Atividade{}
+
+	err = cursor.All(ctx, &atividades)
+	if err != nil {
+		return nil, erroNovo(ErroPegarAtividadeDiaDB, nil, err)
+	}
+
+	return atividades, nil
+}
+
+// PegarAtividades retorna todas as atividades do banco de dados.
+func (dados *Dados) PegarAtividades(ctx context.Context) ([]*Atividade, *Erro) {
+	dados.Log.Informação("Pegando todas as atividades do banco de dados")
+
+	ctx, cancel := context.WithTimeout(ctx, dados.Timeout)
+	defer cancel()
+
+	cursor, err := dados.Collection.Find(ctx, nil)
+	if err != nil {
+		return nil, erroNovo(ErroPegarAtividadeDiaDB, nil, err)
+	}
+
+	atividades := []*Atividade{}
+
+	err = cursor.All(ctx, &atividades)
+	if err != nil {
+		return nil, erroNovo(ErroPegarAtividadeDiaDB, nil, err)
+	}
+
+	return atividades, nil
+}
+
 // Deletar remove uma atividade do banco de dados.
 func (dados *Dados) Deletar(ctx context.Context, _id id) *Erro {
 	dados.Log.Informação("Deletando atividade no banco de dados com ID:", _id)
@@ -102,7 +150,7 @@ func (dados *Dados) Deletar(ctx context.Context, _id id) *Erro {
 
 	_, err := dados.Collection.DeleteOne(ctx, bson.M{"_id": _id})
 	if err != nil {
-		return erroNovo(ErroDeletarAtividade, nil, err)
+		return erroNovo(ErroDeletarAtividadeBD, nil, err)
 	}
 
 	return nil

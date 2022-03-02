@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -62,17 +63,46 @@ var (
 		Mensagem: "Erro ao converte a atividade do contexto",
 		Código:   "CONTROLADORES-[10]",
 	}
+	ErroAtividadeNãoEncontrada = &erroPadrão{
+		Mensagem: "Não foi econtrada essa atividade",
+		Código:   "CONTROLADORES-[11]",
+	}
+	ErroAtualizarAtividade = &erroPadrão{
+		Mensagem: "Erro ao atualizar a atividade",
+		Código:   "CONTROLADORES-[12]",
+	}
+	ErroCriarAtividade = &erroPadrão{
+		Mensagem: "Erro ao criar a atividade",
+		Código:   "CONTROLADORES-[13]",
+	}
+	ErroPegarAtividadeID = &erroPadrão{
+		Mensagem: "Erro ao pegar a atividade por ID",
+		Código:   "CONTROLADORES-[14]",
+	}
+	ErroPegarAtividadeDia = &erroPadrão{
+		Mensagem: "Erro ao pegar a atividade por dia",
+		Código:   "CONTROLADORES-[15]",
+	}
+	ErroPegarAtividades = &erroPadrão{
+		Mensagem: "Erro ao pegar todas as atividades",
+		Código:   "CONTROLADORES-[16]",
+	}
+	ErroDeletarAtividade = &erroPadrão{
+		Mensagem: "Erro ao deletar a atividade",
+		Código:   "CONTROLADORES-[17]",
+	}
 )
 
 type mensagemJSON struct {
 	Mensagem  string
 	Erros     []string
-	Atividade []Atividade
+	Atividade []*Atividade
 }
 
 type controlador struct {
 	Log       *Log
 	validator *validator.Validate
+	dados     *Dados
 }
 
 var uni *ut.UniversalTranslator //nolint: gochecknoglobals
@@ -100,9 +130,12 @@ func (controlador *controlador) enviarErro(ginC *gin.Context, erro *Erro) {
 			código = http.StatusBadRequest
 			mensagem = erro.Mensagem
 		}
+	case ErroAtividadeNãoEncontrada.Código:
+		código = http.StatusNotFound
+		mensagem = erro.Mensagem
 	default:
 		código = http.StatusInternalServerError
-		mensagem = "Ocoreu um erro inesperado"
+		mensagem = "Ocorreu um erro inesperado"
 
 		controlador.Log.Erro(erro.Traçado())
 	}
@@ -251,12 +284,19 @@ func (controlador *controlador) adicionarAtividade(ginC *gin.Context) {
 	_id := uuid.New()
 	atividade.ID = _id
 
+	erro = controlador.dados.SalvarAtividade(context.Background(), atividade)
+	if erro != nil {
+		controlador.enviarErro(ginC, erroNovo(ErroCriarAtividade, erro, nil))
+
+		return
+	}
+
 	mensagem := fmt.Sprintf("Tarefa com ID %s adicionada com sucesso", _id)
 
 	ginC.JSON(http.StatusCreated, mensagemJSON{
 		Mensagem:  mensagem,
 		Erros:     nil,
-		Atividade: []Atividade{*atividade},
+		Atividade: []*Atividade{atividade},
 	})
 }
 
@@ -277,12 +317,32 @@ func (controlador *controlador) atualizarAtividade(ginC *gin.Context) {
 
 	atividade.ID = *_id
 
+	_, erro = controlador.dados.PegarAtividade(context.Background(), *_id)
+	if erro != nil {
+		if erro.Código == ErroAtividadeNãoEncontradaBD.Código {
+			controlador.enviarErro(ginC, erroNovo(ErroAtividadeNãoEncontrada, erro, nil))
+
+			return
+		}
+
+		controlador.enviarErro(ginC, erroNovo(ErroAtualizarAtividade, erro, nil))
+
+		return
+	}
+
+	erro = controlador.dados.AtualizarAtividade(context.Background(), *_id, atividade)
+	if erro != nil {
+		controlador.enviarErro(ginC, erroNovo(ErroAtualizarAtividade, erro, nil))
+
+		return
+	}
+
 	mensagem := fmt.Sprintf("Tarefa com ID %s atualizada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:  mensagem,
 		Erros:     nil,
-		Atividade: []Atividade{*atividade},
+		Atividade: []*Atividade{atividade},
 	})
 }
 
@@ -294,12 +354,25 @@ func (controlador *controlador) pegarTarefa(ginC *gin.Context) {
 		return
 	}
 
+	atividade, erro := controlador.dados.PegarAtividade(context.Background(), *_id)
+	if erro != nil {
+		if erro.Código == ErroAtividadeNãoEncontradaBD.Código {
+			controlador.enviarErro(ginC, erroNovo(ErroAtividadeNãoEncontrada, erro, nil))
+
+			return
+		}
+
+		controlador.enviarErro(ginC, erroNovo(ErroPegarAtividadeID, erro, nil))
+
+		return
+	}
+
 	mensagem := fmt.Sprintf("Tarefa com ID %s econtrada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:  mensagem,
 		Erros:     nil,
-		Atividade: nil,
+		Atividade: []*Atividade{atividade},
 	})
 }
 
@@ -323,22 +396,61 @@ func (controlador *controlador) pegarTarefasPorDia(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefas do dia %s econtradas com sucesso", dia)
+	atividades, erro := controlador.dados.PegarAtividadeDia(context.Background(), dia)
+	if erro != nil {
+		controlador.enviarErro(ginC, erroNovo(ErroPegarAtividadeDia, erro, nil))
+
+		return
+	}
+
+	mensagem := fmt.Sprintf("Atividades do dia %s econtradas com sucesso", dia)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:  mensagem,
 		Erros:     nil,
-		Atividade: nil,
+		Atividade: atividades,
 	})
 }
 
 func (controlador *controlador) pegarTarefas(ginC *gin.Context) {
+	atividades, erro := controlador.dados.PegarAtividades(context.Background())
+	if erro != nil {
+		controlador.enviarErro(ginC, erroNovo(ErroPegarAtividades, erro, nil))
+
+		return
+	}
+
+	ginC.JSON(http.StatusOK, mensagemJSON{
+		Mensagem:  "Atividades econtradas com sucesso",
+		Erros:     nil,
+		Atividade: atividades,
+	})
 }
 
 func (controlador *controlador) deletarTarefa(ginC *gin.Context) {
 	_id, erro := controlador.pegarIDContexto(ginC)
 	if erro != nil {
 		controlador.enviarErro(ginC, erro)
+
+		return
+	}
+
+	_, erro = controlador.dados.PegarAtividade(context.Background(), *_id)
+	if erro != nil {
+		if erro.Código == ErroAtividadeNãoEncontradaBD.Código {
+			controlador.enviarErro(ginC, erroNovo(ErroAtividadeNãoEncontrada, erro, nil))
+
+			return
+		}
+
+		controlador.enviarErro(ginC, erroNovo(ErroDeletarAtividade, erro, nil))
+
+		return
+	}
+
+	erro = controlador.dados.Deletar(context.Background(), *_id)
+	if erro != nil {
+		controlador.enviarErro(ginC, erroNovo(ErroDeletarAtividade, erro, nil))
 
 		return
 	}
@@ -361,7 +473,7 @@ func rotasTarefas(roteamento *gin.RouterGroup, controlador *controlador) {
 	roteamento.DELETE("/:id", controlador.pegarID, controlador.deletarTarefa)
 }
 
-func rotas(url string, _ *Dados) {
+func rotas(url string, dados *Dados) {
 	roteamento := gin.Default()
 
 	validate := validator.New()
@@ -392,6 +504,7 @@ func rotas(url string, _ *Dados) {
 	rotasTarefas(roteamento.Group("/atividade"), &controlador{
 		Log:       NovoLog(os.Stdout, NívelDebug),
 		validator: validate,
+		dados:     dados,
 	})
 
 	if err := roteamento.Run(url); err != nil {

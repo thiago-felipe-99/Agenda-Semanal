@@ -39,7 +39,6 @@ type erroPadrão struct {
 	Código   string
 }
 
-// nolint:unparam
 func erroNovo(padrão *erroPadrão, inicial *Erro, externo error) *Erro {
 	return &Erro{
 		Mensagem:    padrão.Mensagem,
