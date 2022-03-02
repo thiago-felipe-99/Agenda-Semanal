@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -508,7 +509,13 @@ func rotas(url string, dados *Dados) {
 	})
 
 	if os.Getenv("DEPLOY") == "prod" {
-		url = ""
+		port := os.Getenv("PORT")
+		if port == "" {
+			panic("A variável $PORT é requirida")
+		}
+		url = ":" + port
+	} else {
+		log.Println("Rodando em modo de desenvolvimento")
 	}
 
 	if err := roteamento.Run(url); err != nil {
