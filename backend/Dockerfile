@@ -1,10 +1,13 @@
-FROM golang:1.17.7-alpine
+FROM golang:1.17.7-alpine as build
 
-RUN apk update && apk upgrade
-RUN apk add git
+COPY . /build
 
-COPY entrypoint.sh /entrypoint.sh
+WORKDIR /build
 
-RUN chmod +x /entrypoint.sh
+RUN go build -o main
 
-ENTRYPOINT ["/entrypoint.sh"]
+FROM alpine
+
+COPY --from=build /build/main /main
+
+ENTRYPOINT ["/main"]
