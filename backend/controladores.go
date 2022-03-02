@@ -95,9 +95,9 @@ var (
 )
 
 type mensagemJSON struct {
-	Mensagem  string
-	Erros     []string
-	Atividade []*Atividade
+	Mensagem   string       `json:"mensagem"`
+	Erros      []string     `json:"erros"`
+	Atividades []*Atividade `json:"atividades"`
 }
 
 type controlador struct {
@@ -142,9 +142,9 @@ func (controlador *controlador) enviarErro(ginC *gin.Context, erro *Erro) {
 	}
 
 	ginC.JSON(código, mensagemJSON{
-		Mensagem:  mensagem,
-		Erros:     []string{mensagem},
-		Atividade: nil,
+		Mensagem:   mensagem,
+		Erros:      []string{mensagem},
+		Atividades: nil,
 	})
 	ginC.Abort()
 }
@@ -215,9 +215,9 @@ func (controlador *controlador) pegarBodyTarefa(ginC *gin.Context) {
 			}
 
 			ginC.JSON(http.StatusBadRequest, mensagemJSON{
-				Mensagem:  "Foi passado valores inválidos no body",
-				Erros:     mensagens,
-				Atividade: nil,
+				Mensagem:   "Foi passado valores inválidos no body",
+				Erros:      mensagens,
+				Atividades: nil,
 			})
 			ginC.Abort()
 
@@ -295,9 +295,9 @@ func (controlador *controlador) adicionarAtividade(ginC *gin.Context) {
 	mensagem := fmt.Sprintf("Tarefa com ID %s adicionada com sucesso", _id)
 
 	ginC.JSON(http.StatusCreated, mensagemJSON{
-		Mensagem:  mensagem,
-		Erros:     nil,
-		Atividade: []*Atividade{atividade},
+		Mensagem:   mensagem,
+		Erros:      nil,
+		Atividades: []*Atividade{atividade},
 	})
 }
 
@@ -341,9 +341,9 @@ func (controlador *controlador) atualizarAtividade(ginC *gin.Context) {
 	mensagem := fmt.Sprintf("Tarefa com ID %s atualizada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
-		Mensagem:  mensagem,
-		Erros:     nil,
-		Atividade: []*Atividade{atividade},
+		Mensagem:   mensagem,
+		Erros:      nil,
+		Atividades: []*Atividade{atividade},
 	})
 }
 
@@ -371,9 +371,9 @@ func (controlador *controlador) pegarTarefa(ginC *gin.Context) {
 	mensagem := fmt.Sprintf("Tarefa com ID %s econtrada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
-		Mensagem:  mensagem,
-		Erros:     nil,
-		Atividade: []*Atividade{atividade},
+		Mensagem:   mensagem,
+		Erros:      nil,
+		Atividades: []*Atividade{atividade},
 	})
 }
 
@@ -407,9 +407,9 @@ func (controlador *controlador) pegarTarefasPorDia(ginC *gin.Context) {
 	mensagem := fmt.Sprintf("Atividades do dia %s econtradas com sucesso", dia)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
-		Mensagem:  mensagem,
-		Erros:     nil,
-		Atividade: atividades,
+		Mensagem:   mensagem,
+		Erros:      nil,
+		Atividades: atividades,
 	})
 }
 
@@ -422,9 +422,9 @@ func (controlador *controlador) pegarTarefas(ginC *gin.Context) {
 	}
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
-		Mensagem:  "Atividades econtradas com sucesso",
-		Erros:     nil,
-		Atividade: atividades,
+		Mensagem:   "Atividades econtradas com sucesso",
+		Erros:      nil,
+		Atividades: atividades,
 	})
 }
 
@@ -459,9 +459,9 @@ func (controlador *controlador) deletarTarefa(ginC *gin.Context) {
 	mensagem := fmt.Sprintf("Tarefa com ID %s deletada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
-		Mensagem:  mensagem,
-		Erros:     nil,
-		Atividade: nil,
+		Mensagem:   mensagem,
+		Erros:      nil,
+		Atividades: nil,
 	})
 }
 
