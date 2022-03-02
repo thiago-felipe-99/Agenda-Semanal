@@ -6,8 +6,13 @@ WORKDIR /build
 
 RUN go build -o main
 
-FROM alpine
+FROM heroku/heroku:20
 
-COPY --from=build /build/main /main
+COPY --from=build /build/main /app/main
 
-ENTRYPOINT ["/main"]
+ENV HOME /app
+WORKDIR /app
+RUN useradd -m heroku
+USER heroku
+
+ENTRYPOINT ["/app/main"]
