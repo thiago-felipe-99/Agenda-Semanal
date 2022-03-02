@@ -19,11 +19,11 @@ services:
     container_name: backend-agenda-semanal
     restart: always
     environment:
-      MONGO_DB_URI: "mongodb://root:root@banco-de-dados-agenda-semanal:2002"
+      MONGO_DB_URI: "mongodb://root:root@banco-de-dados-agenda-semanal:27017"
       NOME_DB: "atividade"
       NOME_COLLECTION: "atividade"
       PORT: "2001"
-      HOST_HTTP: "127.0.0.1"
+      HOST_HTTP: "0.0.0.0"
     ports:
       - "2001:2001"
 

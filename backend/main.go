@@ -78,7 +78,6 @@ func PegandoVariáveisDeAmbiente() (variáveis VariáveisDeAmbiente) {
 	}
 	variáveis.Host = os.Getenv("HOST_HTTP")
 	if variáveis.Host == "" {
-		variáveis.Host = "127.0.0.1"
 		log.Println("A variável de ambiente HOST_HTTP não foi inicializada")
 	}
 
@@ -86,6 +85,7 @@ func PegandoVariáveisDeAmbiente() (variáveis VariáveisDeAmbiente) {
 }
 
 func main() {
+	log.Println("Iniciando servidor")
 	ambiente := PegandoVariáveisDeAmbiente()
 	ctx := context.Background()
 
