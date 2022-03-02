@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  mongoDB:
+  banco-de-dados:
     image: mongo:5.0.3
-    container_name: mongoDB-trabalhofinal
+    container_name: banco-de-dados-agenda-semanal
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -11,5 +11,19 @@ services:
     volumes:
       - ./data/mongoDB:/data/db
     ports:
-      - "2001:27017"
+      - "2002:27017"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-agenda-semanal
+    restart: always
+    environment:
+      MONGO_DB_URI: "mongodb://root:root@banco-de-dados-agenda-semanal:2002"
+      NOME_DB: "atividade"
+      NOME_COLLECTION: "atividade"
+      PORT: "2001"
+      HOST_HTTP: "127.0.0.1"
+    ports:
+      - "2001:2001"
 
