@@ -507,6 +507,10 @@ func rotas(url string, dados *Dados) {
 		dados:     dados,
 	})
 
+	if os.Getenv("DEPLOY") == "prod" {
+		url = ""
+	}
+
 	if err := roteamento.Run(url); err != nil {
 		panic(err)
 	}
