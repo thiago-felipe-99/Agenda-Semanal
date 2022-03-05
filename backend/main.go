@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -23,7 +24,7 @@ var (
 	}
 )
 
-type id = uuid.UUID
+type id = uint32
 
 // Atividade representa a entidade atividade da aplicação.
 type Atividade struct {
@@ -36,12 +37,20 @@ type Atividade struct {
 
 // ParseID retorna um ID a partir de uma string válida.
 func ParseID(parse string) (id, *Erro) {
-	id, err := uuid.Parse(parse)
+	id, err := strconv.ParseUint(parse, 10, 32)
 	if err != nil {
-		return id, erroNovo(ErroAoValidarID, nil, err)
+		return 0, erroNovo(ErroAoValidarID, nil, err)
 	}
 
-	return id, nil
+	return uint32(id), nil
+}
+
+// CreateID criar um novo ID
+func CreateID() id {
+
+	rand.Seed(time.Now().UnixNano())
+
+	return rand.Uint32()
 }
 
 // VariáveisDeAmbiente representa as váriveis de ambiente que a aplicação

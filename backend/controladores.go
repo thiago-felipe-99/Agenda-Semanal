@@ -20,7 +20,6 @@ import (
 	en_tradução "github.com/go-playground/validator/v10/translations/en"
 	es_tradução "github.com/go-playground/validator/v10/translations/es"
 	pt_tradução "github.com/go-playground/validator/v10/translations/pt_BR"
-	"github.com/google/uuid"
 )
 
 var (
@@ -282,7 +281,7 @@ func (controlador *controlador) adicionarAtividade(ginC *gin.Context) {
 		return
 	}
 
-	_id := uuid.New()
+	_id := CreateID()
 	atividade.ID = _id
 
 	erro = controlador.dados.SalvarAtividade(context.Background(), atividade)
@@ -292,7 +291,7 @@ func (controlador *controlador) adicionarAtividade(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %s adicionada com sucesso", _id)
+	mensagem := fmt.Sprintf("Tarefa com ID %d adicionada com sucesso", _id)
 
 	ginC.JSON(http.StatusCreated, mensagemJSON{
 		Mensagem:   mensagem,
@@ -338,7 +337,7 @@ func (controlador *controlador) atualizarAtividade(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %s atualizada com sucesso", _id)
+	mensagem := fmt.Sprintf("Tarefa com ID %d atualizada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
@@ -368,7 +367,7 @@ func (controlador *controlador) pegarTarefa(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %s econtrada com sucesso", _id)
+	mensagem := fmt.Sprintf("Tarefa com ID %d econtrada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
@@ -456,7 +455,7 @@ func (controlador *controlador) deletarTarefa(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %s deletada com sucesso", _id)
+	mensagem := fmt.Sprintf("Tarefa com ID %d deletada com sucesso", _id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
