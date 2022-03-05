@@ -281,7 +281,13 @@ func (controlador *controlador) adicionarAtividade(ginC *gin.Context) {
 		return
 	}
 
-	_id := CreateID()
+	_id, erro := CreateID(controlador.dados)
+	if erro != nil {
+		controlador.enviarErro(ginC, erroNovo(ErroCriarAtividade, erro, nil))
+
+		return
+	}
+
 	atividade.ID = _id
 
 	erro = controlador.dados.SalvarAtividade(context.Background(), atividade)

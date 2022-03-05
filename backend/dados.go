@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -154,4 +155,26 @@ func (dados *Dados) Deletar(ctx context.Context, _id id) *Erro {
 	}
 
 	return nil
+}
+
+// ID retorna um maior ID que está no banco de dados.
+func (dados *Dados) ID(ctx context.Context) (id, *Erro) {
+	dados.Log.Informação("Pegando último ID do banco de dados")
+
+	ctx, cancel := context.WithTimeout(ctx, dados.Timeout)
+	defer cancel()
+
+	var atividade Atividade
+
+	err := dados.Collection.FindOne(ctx, bson.M{}, &options.FindOneOptions{Sort: bson.M{"_id": -1}}).Decode(&atividade)
+
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return 0, nil
+		}
+
+		return 0, erroNovo(ErroPegarAtividadeBD, nil, err)
+	}
+
+	return atividade.ID, nil
 }

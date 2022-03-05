@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -46,11 +45,10 @@ func ParseID(parse string) (id, *Erro) {
 }
 
 // CreateID criar um novo ID
-func CreateID() id {
+func CreateID(dado *Dados) (id, *Erro) {
 
-	rand.Seed(time.Now().UnixNano())
-
-	return rand.Uint32()
+	id, erro := dado.ID(context.Background())
+	return (id + 1), erro
 }
 
 // VariáveisDeAmbiente representa as váriveis de ambiente que a aplicação
