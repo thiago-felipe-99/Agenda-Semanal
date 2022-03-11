@@ -99,7 +99,8 @@ type mensagemJSON struct {
 	Atividades []*Atividade `json:"atividades"`
 }
 
-type controlador struct {
+// Controlador é uma estrutura que representa endpoits da aplicação.
+type Controlador struct {
 	Log       *Log
 	validator *validator.Validate
 	dados     *Dados
@@ -116,7 +117,7 @@ func pegarTradutor(c *gin.Context) *ut.Translator {
 	return &trans
 }
 
-func (controlador *controlador) enviarErro(ginC *gin.Context, erro *Erro) {
+func (controlador *Controlador) enviarErro(ginC *gin.Context, erro *Erro) {
 	var (
 		código   int
 		mensagem string
@@ -148,7 +149,7 @@ func (controlador *controlador) enviarErro(ginC *gin.Context, erro *Erro) {
 	ginC.Abort()
 }
 
-func (controlador *controlador) pegarID(ginC *gin.Context) {
+func (controlador *Controlador) PegarID(ginC *gin.Context) {
 	_id, erro := ParseID(ginC.Params.ByName("id"))
 	if erro != nil {
 		controlador.enviarErro(ginC, erro)
@@ -160,7 +161,7 @@ func (controlador *controlador) pegarID(ginC *gin.Context) {
 	ginC.Next()
 }
 
-func (controlador *controlador) pegarIDContexto(ginC *gin.Context) (*id, *Erro) {
+func (controlador *Controlador) pegarIDContexto(ginC *gin.Context) (*id, *Erro) {
 	IDGet, existe := ginC.Get("id")
 	if !existe {
 		return nil, erroNovo(ErroIDNãoExisteNoContexto, nil, nil)
@@ -174,8 +175,9 @@ func (controlador *controlador) pegarIDContexto(ginC *gin.Context) (*id, *Erro) 
 	return id, nil
 }
 
+// PegarBodyAtividade pega o body do tipo atividade na requisição.
 //nolint: funlen
-func (controlador *controlador) pegarBodyTarefa(ginC *gin.Context) {
+func (controlador *Controlador) PegarBodyAtividade(ginC *gin.Context) {
 	decodificador := json.NewDecoder(ginC.Request.Body)
 	atividadeJSON := struct {
 		Nome   string        `json:"nome" validate:"required"`
@@ -259,7 +261,7 @@ func (controlador *controlador) pegarBodyTarefa(ginC *gin.Context) {
 	ginC.Next()
 }
 
-func (controlador *controlador) pegarAtividadeContexto(c *gin.Context) (*Atividade, *Erro) {
+func (controlador *Controlador) pegarAtividadeContexto(c *gin.Context) (*Atividade, *Erro) {
 	pessoaGet, existe := c.Get("atividade")
 	if !existe {
 		return nil, erroNovo(ErroAtividadeNãoExisteNoContexto, nil, nil)
@@ -273,7 +275,7 @@ func (controlador *controlador) pegarAtividadeContexto(c *gin.Context) (*Ativida
 	return pessoa, nil
 }
 
-func (controlador *controlador) adicionarAtividade(ginC *gin.Context) {
+func (controlador *Controlador) AdicionarAtividade(ginC *gin.Context) {
 	atividade, erro := controlador.pegarAtividadeContexto(ginC)
 	if erro != nil {
 		controlador.enviarErro(ginC, erro)
@@ -297,7 +299,7 @@ func (controlador *controlador) adicionarAtividade(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %d adicionada com sucesso", _id)
+	mensagem := fmt.Sprintf("Atividade com ID %d adicionada com sucesso", _id)
 
 	ginC.JSON(http.StatusCreated, mensagemJSON{
 		Mensagem:   mensagem,
@@ -306,7 +308,7 @@ func (controlador *controlador) adicionarAtividade(ginC *gin.Context) {
 	})
 }
 
-func (controlador *controlador) atualizarAtividade(ginC *gin.Context) {
+func (controlador *Controlador) AtualizarAtividade(ginC *gin.Context) {
 	_id, erro := controlador.pegarIDContexto(ginC)
 	if erro != nil {
 		controlador.enviarErro(ginC, erro)
@@ -343,7 +345,7 @@ func (controlador *controlador) atualizarAtividade(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %d atualizada com sucesso", *_id)
+	mensagem := fmt.Sprintf("Atividade com ID %d atualizada com sucesso", *_id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
@@ -352,7 +354,7 @@ func (controlador *controlador) atualizarAtividade(ginC *gin.Context) {
 	})
 }
 
-func (controlador *controlador) pegarTarefa(ginC *gin.Context) {
+func (controlador *Controlador) PegarAtividade(ginC *gin.Context) {
 	_id, erro := controlador.pegarIDContexto(ginC)
 	if erro != nil {
 		controlador.enviarErro(ginC, erro)
@@ -373,7 +375,7 @@ func (controlador *controlador) pegarTarefa(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %d econtrada com sucesso", *_id)
+	mensagem := fmt.Sprintf("Atividade com ID %d econtrada com sucesso", *_id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
@@ -394,7 +396,7 @@ func diaValido(dia string) bool {
 	return false
 }
 
-func (controlador *controlador) pegarTarefasPorDia(ginC *gin.Context) {
+func (controlador *Controlador) PegarAtividadesPorDia(ginC *gin.Context) {
 	dia := ginC.Params.ByName("dia")
 	if !diaValido(dia) {
 		controlador.enviarErro(ginC, erroNovo(ErroDiaInvalido, nil, nil))
@@ -418,7 +420,7 @@ func (controlador *controlador) pegarTarefasPorDia(ginC *gin.Context) {
 	})
 }
 
-func (controlador *controlador) pegarTarefas(ginC *gin.Context) {
+func (controlador *Controlador) PegarAtividades(ginC *gin.Context) {
 	atividades, erro := controlador.dados.PegarAtividades(context.Background())
 	if erro != nil {
 		controlador.enviarErro(ginC, erroNovo(ErroPegarAtividades, erro, nil))
@@ -433,7 +435,7 @@ func (controlador *controlador) pegarTarefas(ginC *gin.Context) {
 	})
 }
 
-func (controlador *controlador) deletarTarefa(ginC *gin.Context) {
+func (controlador *Controlador) DeletarAtividade(ginC *gin.Context) {
 	_id, erro := controlador.pegarIDContexto(ginC)
 	if erro != nil {
 		controlador.enviarErro(ginC, erro)
@@ -461,7 +463,7 @@ func (controlador *controlador) deletarTarefa(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %d deletada com sucesso", *_id)
+	mensagem := fmt.Sprintf("Atividade com ID %d deletada com sucesso", *_id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
@@ -470,13 +472,13 @@ func (controlador *controlador) deletarTarefa(ginC *gin.Context) {
 	})
 }
 
-func rotasTarefas(roteamento *gin.RouterGroup, controlador *controlador) {
-	roteamento.POST("", controlador.pegarBodyTarefa, controlador.adicionarAtividade)
-	roteamento.PUT("/:id", controlador.pegarID, controlador.pegarBodyTarefa, controlador.atualizarAtividade)
-	roteamento.GET("/:id", controlador.pegarID, controlador.pegarTarefa)
-	roteamento.GET("/dia/:dia", controlador.pegarTarefasPorDia)
-	roteamento.GET("", controlador.pegarTarefas)
-	roteamento.DELETE("/:id", controlador.pegarID, controlador.deletarTarefa)
+func rotasAtividades(roteamento *gin.RouterGroup, controlador *Controlador) {
+	roteamento.POST("", controlador.PegarBodyAtividade, controlador.AdicionarAtividade)
+	roteamento.PUT("/:id", controlador.PegarID, controlador.PegarBodyAtividade, controlador.AtualizarAtividade)
+	roteamento.GET("/:id", controlador.PegarID, controlador.PegarAtividade)
+	roteamento.GET("/dia/:dia", controlador.PegarAtividadesPorDia)
+	roteamento.GET("", controlador.PegarAtividades)
+	roteamento.DELETE("/:id", controlador.PegarID, controlador.DeletarAtividade)
 }
 
 func rotas(url string, dados *Dados) {
@@ -507,7 +509,7 @@ func rotas(url string, dados *Dados) {
 		panic(err)
 	}
 
-	rotasTarefas(roteamento.Group("/atividade"), &controlador{
+	rotasAtividades(roteamento.Group("/atividade"), &Controlador{
 		Log:       NovoLog(os.Stdout, NívelDebug),
 		validator: validate,
 		dados:     dados,
