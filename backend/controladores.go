@@ -343,7 +343,7 @@ func (controlador *controlador) atualizarAtividade(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %d atualizada com sucesso", _id)
+	mensagem := fmt.Sprintf("Tarefa com ID %d atualizada com sucesso", *_id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
@@ -373,7 +373,7 @@ func (controlador *controlador) pegarTarefa(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %d econtrada com sucesso", _id)
+	mensagem := fmt.Sprintf("Tarefa com ID %d econtrada com sucesso", *_id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
@@ -461,7 +461,7 @@ func (controlador *controlador) deletarTarefa(ginC *gin.Context) {
 		return
 	}
 
-	mensagem := fmt.Sprintf("Tarefa com ID %d deletada com sucesso", _id)
+	mensagem := fmt.Sprintf("Tarefa com ID %d deletada com sucesso", *_id)
 
 	ginC.JSON(http.StatusOK, mensagemJSON{
 		Mensagem:   mensagem,
